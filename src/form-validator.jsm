@@ -45,17 +45,22 @@ export default class FormValidator {
     }
 
     checkStatus(forceStatus) {
-        const status = (typeof forceStatus === 'boolean') ? forceStatus : this.isValid();
+        const status =
+            typeof forceStatus === 'boolean' ? forceStatus : this.isValid();
 
         if (status) {
             if (!this.wasValid) {
-                this.form.dispatchEvent(createEvent('changeStatus', {valid: true}))
+                this.form.dispatchEvent(
+                    createEvent('changeStatus', { valid: true })
+                );
             }
 
             this.wasValid = true;
         } else {
             if (this.wasValid || this.wasValid === undefined) {
-                this.form.dispatchEvent(createEvent('changeStatus', {valid: false}))
+                this.form.dispatchEvent(
+                    createEvent('changeStatus', { valid: false })
+                );
             }
 
             this.wasValid = false;

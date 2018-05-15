@@ -17,5 +17,5 @@ el.querySelectorAll('input').forEach(input => {
 
     field.on('changeStatus', e => {
         field.updateError();
-    })
+    });
 });

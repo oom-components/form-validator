@@ -1,4 +1,3 @@
-
 const errorTypes = {
     valueMissing: '',
     typeMismatch: '',
@@ -8,7 +7,7 @@ const errorTypes = {
     stepMismatch: '',
     rangeOverflow: '',
     rangeUnderflow: '',
-    patternMismatch: '',
+    patternMismatch: ''
 };
 
 export default class Field {
@@ -21,7 +20,7 @@ export default class Field {
 
         input.addEventListener('input', e => this.checkStatus(e));
         input.addEventListener('change', e => this.checkStatus(e));
-        input.addEventListener('focus', e => this.pristine = false);
+        input.addEventListener('focus', e => (this.pristine = false));
 
         setTimeout(() => this.checkStatus(), 0);
     }
@@ -70,11 +69,13 @@ export default class Field {
         const errorType = this.getErrorType();
 
         if (this.lastErrorType !== errorType) {
-            this.input.dispatchEvent(createEvent('changeStatus', {
-                valid: !errorType,
-                errorType: errorType,
-                originalEvent: e
-            }));
+            this.input.dispatchEvent(
+                createEvent('changeStatus', {
+                    valid: !errorType,
+                    errorType: errorType,
+                    originalEvent: e
+                })
+            );
             this.form.checkStatus();
         }
 
@@ -120,7 +121,9 @@ export default class Field {
         }
 
         this.errorLabel.innerText = message;
-        this.input.dispatchEvent(createEvent('showError', {errorLabel: this.errorLabel}));
+        this.input.dispatchEvent(
+            createEvent('showError', { errorLabel: this.errorLabel })
+        );
     }
 }
 
