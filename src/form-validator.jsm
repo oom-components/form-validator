@@ -1,7 +1,7 @@
 import Field from './field.jsm';
 
-export default class Form {
-    constructor(form, handler, fields = 'input:not([type="hidden"]):not([type="submit"]),select,textarea') {
+export default class FormValidator {
+    constructor(form, handler) {
         this.form = form;
         this.form.setAttribute('novalidate', true);
         this.form.addEventListener('submit', e => {
@@ -10,10 +10,34 @@ export default class Form {
             }
         });
 
-        this.fields = Array.from(this.form.querySelectorAll(fields)).map(input => new Field(input, this));
+        this.fields = [];
         this.handler = handler;
 
         setTimeout(() => this.checkStatus(), 0);
+    }
+
+    addField(input) {
+        if (typeof input === 'string') {
+            input = this.form.querySelector(input);
+        }
+
+        if (!input) {
+            throw new Error('No input provided');
+        }
+
+        const field = new Field(input, this);
+
+        this.fields.push(field);
+
+        return field;
+    }
+
+    isPristine() {
+        return this.fields.every(field => field.isPristine());
+    }
+
+    isDirty() {
+        return this.fields.some(field => field.isDirty());
     }
 
     isValid() {
@@ -25,13 +49,13 @@ export default class Form {
 
         if (status) {
             if (!this.wasValid) {
-                this.form.dispatchEvent(createEvent('changeValidity', {valid: true}))
+                this.form.dispatchEvent(createEvent('changeStatus', {valid: true}))
             }
 
             this.wasValid = true;
         } else {
             if (this.wasValid || this.wasValid === undefined) {
-                this.form.dispatchEvent(createEvent('changeValidity', {valid: false}))
+                this.form.dispatchEvent(createEvent('changeStatus', {valid: false}))
             }
 
             this.wasValid = false;

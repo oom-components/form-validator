@@ -1,0 +1,39 @@
+{
+  "name": "@oom/form-validator",
+  "version": "1.0.0",
+  "description": "Form validation library",
+  "main": "src/form.js",
+  "scripts": {
+    "start": "webpack --config demo/webpack.config.js --watch & http-server demo -c-1",
+    "prettier": "prettier src/*.jsm demo/script.jsm --single-quote --tab-width 4 --write",
+    "gh-pages": "webpack --config demo/webpack.config.js && gh-pages -d demo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oom-components/form-validator.git"
+  },
+  "keywords": [
+    "progressive",
+    "web",
+    "component",
+    "form",
+    "validation",
+    "es6"
+  ],
+  "author": "Oscar Otero <oom@oscarotero.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oom-components/form-validator/issues"
+  },
+  "homepage": "https://github.com/oom-components/form-validator#readme",
+  "devDependencies": {
+    "@babel/core": "^7.0.0-beta.46",
+    "@babel/preset-env": "^7.0.0-beta.46",
+    "babel-loader": "^8.0.0-beta.2",
+    "gh-pages": "^1.1.0",
+    "http-server": "^0.11.1",
+    "prettier": "^1.12.1",
+    "webpack": "^4.1.0",
+    "webpack-cli": "^2.1.2"
+  }
+}
