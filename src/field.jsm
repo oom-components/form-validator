@@ -11,33 +11,24 @@ const errorTypes = {
 };
 
 export default class Field {
-    constructor(input, form) {
+    constructor(input) {
         this.input = input;
-        this.form = form;
         this.pristine = true;
 
         this.messages = Object.assign({}, errorTypes);
 
-        input.addEventListener('input', e => this.checkStatus(e));
-        input.addEventListener('change', e => this.checkStatus(e));
+        input.addEventListener('input', e => this._updateStatus(e));
+        input.addEventListener('change', e => this._updateStatus(e));
         input.addEventListener('focus', e => (this.pristine = false));
 
-        setTimeout(() => this.checkStatus(), 0);
+        this._lastErrorType = this.errorType;
     }
 
-    isPristine() {
-        return this.pristine;
-    }
-
-    isDirty() {
-        return !this.pristine;
-    }
-
-    isValid() {
+    get valid() {
         return this.input.validity.valid;
     }
 
-    getErrorType() {
+    get errorType() {
         const validity = this.input.validity;
 
         if (validity.valid) {
@@ -51,13 +42,9 @@ export default class Field {
         }
     }
 
-    setErrorMessages(messages = {}) {
-        Object.assign(this.messages, messages);
+    get errorMessage() {
+        const type = this.errorType;
 
-        return this;
-    }
-
-    getErrorMessage(type) {
         if (!type) {
             return '';
         }
@@ -65,21 +52,10 @@ export default class Field {
         return this.messages[type] || this.input.validationMessage;
     }
 
-    checkStatus(e) {
-        const errorType = this.getErrorType();
+    setErrorMessages(messages = {}) {
+        Object.assign(this.messages, messages);
 
-        if (this.lastErrorType !== errorType) {
-            this.input.dispatchEvent(
-                createEvent('changeStatus', {
-                    valid: !errorType,
-                    errorType: errorType,
-                    originalEvent: e
-                })
-            );
-            this.form.checkStatus();
-        }
-
-        this.lastErrorType = errorType;
+        return this;
     }
 
     on(event, callback) {
@@ -88,42 +64,28 @@ export default class Field {
         return this;
     }
 
-    updateError(text) {
-        let message;
+    _updateStatus(e) {
+        const errorType = this.errorType;
 
-        if (!text) {
-            message = this.getErrorMessage(this.getErrorType());
-        } else {
-            message = this.getErrorMessage(text) || text;
+        if (this._lastErrorType !== errorType) {
+            const detail = {
+                pristine: this.pristine,
+                valid: this.valid,
+                errorType: errorType,
+                errorMessage: this.errorMessage,
+                originalEvent: e
+            };
+
+            this.input.dispatchEvent(
+                createEvent('changeStatus', detail)
+            );
+
+            this.input.form.dispatchEvent(
+                createEvent('inputChangeStatus', detail)
+            );
         }
 
-        if (message) {
-            return this.showError(message);
-        }
-
-        this.hideError();
-    }
-
-    hideError() {
-        if (this.errorLabel) {
-            this.errorLabel.remove();
-            delete this.errorLabel;
-        }
-
-        this.input.dispatchEvent(createEvent('hideError'));
-    }
-
-    showError(message) {
-        if (!this.errorLabel) {
-            this.errorLabel = document.createElement('label');
-            this.errorLabel.for = this.input.id;
-            this.input.parentElement.append(this.errorLabel);
-        }
-
-        this.errorLabel.innerText = message;
-        this.input.dispatchEvent(
-            createEvent('showError', { errorLabel: this.errorLabel })
-        );
+        this._lastErrorType = errorType;
     }
 }
 
